@@ -668,7 +668,6 @@ class ConversationExtractor:
                 For forensic and investigative purposes only. Handle according to data protection regulations.
             </p>
             <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #30363d;">
-                <p><strong>North Loop Consulting - Digital Forensics Division</strong></p>
                 <p style="margin-top: 5px; font-size: 0.85em;">
                     Report ID: {FileHasher.md5_string(datetime.now().isoformat())[:16].upper()}<br>
                     Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}<br>
