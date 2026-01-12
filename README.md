@@ -28,6 +28,7 @@ This tool extracts and analyzes conversation data from ChatGPT iOS application b
 - iOS backup extracted from iTunes/Finder backup
 
 ## Usage
+Below are the command line instructions for the script. The backup path should be the root folder for the app's data from either an iTunes backup or a full file system extraction. 
 ```
 usage: ChatGPT_IOS_parser.py [-h] [-c CASE_NUMBER] [-e EVIDENCE_ID] [-x EXAMINER]
                                       [-n NOTES] [-o OUTPUT]
@@ -76,7 +77,7 @@ AppDomain-com.openai.chat/
 
 ### Output
 
-The generated report includes:
+The generated HTML, JSON, or CSV reports include:
 
 - **Report Summary**: Total conversations, messages, and user prompts
 - **Device Information**: Model, OS version, screen resolution, app version, device/user IDs
