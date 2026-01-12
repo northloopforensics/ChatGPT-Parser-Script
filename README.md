@@ -46,19 +46,6 @@ Examples:
 --date-from 2024-01-15
 --date-to 2024-12-31
 
-### Basic Extraction
-
-```bash
-cd /path/to/AppDomain-com.openai.chat
-python3 ChatGPT_IOS_parser.py
-```
-
-The tool will:
-1. Automatically detect the conversations directory (handles any GUID)
-2. Extract all conversations with full metadata
-3. Parse device information from Segment analytics
-4. Generate `chatgpt_forensic_report.html` in the current directory
-
 
 ## Installation
 
@@ -68,7 +55,7 @@ The script uses the default Python library so there is no requirements.txt to co
 
 ## Directory Structure
 
-The tool expects the following iOS backup structure:
+The tool expects similar iOS backup structure:
 
 ```
 AppDomain-com.openai.chat/
@@ -143,9 +130,6 @@ Generated images are **NOT** included in iOS backups. Only metadata references a
 - Contact OpenAI with generation IDs (legal proceedings)
 - Check for cached images in device memory (if not backed up)
 
-### Deleted Conversations
-Once deleted in the ChatGPT app, conversations are removed from subsequent backups. There is no deleted items recovery.
-
 ### Voice Audio
 Raw audio from voice mode conversations is **NOT** stored. Only text transcriptions are preserved.
 
@@ -153,8 +137,6 @@ Raw audio from voice mode conversations is **NOT** stored. Only text transcripti
 - The tool automatically detects multiple user accounts
 - Prioritizes non-default folders with actual content
 - Reports which conversation folder is being used
-
-## Technical Details
 
 ### Timestamp Format
 Apple Cocoa NSDate format: seconds since January 1, 2001 00:00:00 UTC
@@ -178,15 +160,12 @@ The tool uses pattern matching to find conversation folders:
 - Prefers non-default (user account) folders
 - Handles any device/account GUID automatically
 
-## Output Files
-
-- `chatgpt_forensic_report.html` - Main forensic report (standalone, no external dependencies)
 
 ## Troubleshooting
 
 ### "No conversations directory found"
-- Ensure you're running the script from the AppDomain-com.openai.chat root
-- Verify the backup contains Library/Application Support/conversations-v3-* folders
+- Ensure you're running the script on the AppDomain-com.openai.chat root folder
+- Verify the backup contains Library/Application Support/conversations* folders
 - Check that JSON files exist in the conversations directory
 
 ### "Processed 0 conversations"
@@ -200,18 +179,6 @@ The tool uses pattern matching to find conversation folders:
 - Some older backups may not have complete Segment data
 
 
-## Version History
-
-### Version 1.0 (January 11, 2026)
-- Initial release
-- Full conversation extraction
-- Audio transcription support
-- Device information parsing from Segment analytics
-- Interactive HTML report with search
-- Flexible GUID detection
-- Image metadata documentation
-
-
 **North Loop Consulting**  
 Copyright 2026. All rights reserved.
 
@@ -221,26 +188,7 @@ This tool is provided for professional forensic use. Commercial redistribution r
 
 ---
 
-## Quick Reference
 
-### Common Commands
-
-Extract conversations:
-```bash
-python3 ChatGPT_IOS_parser.py
-```
-
-View report:
-```bash
-open chatgpt_forensic_report.html
-```
-
-### Key Files
-
-- `ChatGPT_IOS_parser.py` - Main extraction script
-- `chatgpt_forensic_report.html` - Generated forensic report
-
-### Key Directories
 
 - `Library/Application Support/conversations-v3-{GUID}/` - Conversation data
 - `Library/Application Support/segment/oai/` - Device telemetry
