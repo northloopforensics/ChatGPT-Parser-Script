@@ -27,6 +27,30 @@ This tool extracts and analyzes conversation data from ChatGPT iOS application b
 - Standard library only (no external dependencies)
 - iOS backup extracted from iTunes/Finder backup
 
+## Usage
+```
+usage: ChatGPT_IOS_parser.py [-h] [-c CASE_NUMBER] [-e EVIDENCE_ID] [-x EXAMINER]
+                                      [-n NOTES] [-o OUTPUT]
+                                      [-f {html,json,csv} [{html,json,csv} ...]] [--no-hash]
+                                      [--date-from DATE_FROM] [--date-to DATE_TO] [-l LOG] [-v]
+                                      [-q]
+                                      backup_path
+```
+
+### Basic Extraction
+
+```bash
+cd /path/to/AppDomain-com.openai.chat
+python3 ChatGPT_IOS_parser.py
+```
+
+The tool will:
+1. Automatically detect the conversations directory (handles any GUID)
+2. Extract all conversations with full metadata
+3. Parse device information from Segment analytics
+4. Generate `chatgpt_forensic_report.html` in the current directory
+
+
 ## Installation
 
 No installation required. Simply place `extract_conversations.py` in the root of your extracted iOS backup folder.
@@ -49,20 +73,6 @@ AppDomain-com.openai.chat/
 └── Documents/
 ```
 
-## Usage
-
-### Basic Extraction
-
-```bash
-cd /path/to/AppDomain-com.openai.chat
-python3 ChatGPT_IOS_parser.py
-```
-
-The tool will:
-1. Automatically detect the conversations directory (handles any GUID)
-2. Extract all conversations with full metadata
-3. Parse device information from Segment analytics
-4. Generate `chatgpt_forensic_report.html` in the current directory
 
 ### Output
 
