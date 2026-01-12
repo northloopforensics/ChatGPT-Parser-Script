@@ -3,7 +3,7 @@
 ChatGPT iPhone Backup Conversation Extractor - Forensic Edition
 Digital Forensics Report Generator with Chain of Custody
 
-VERSION: 2.0 Forensic Edition
+VERSION: 2.0 
 Tested on: ChatGPT iOS versions 1.2024.080 (Build 24781), 1.2025.350 (Build 20387701780)
 
 Author: North Loop Consulting
