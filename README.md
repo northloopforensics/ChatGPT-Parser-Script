@@ -3,6 +3,7 @@
 **By North Loop Consulting**  
 **Version 1.0**  
 **Date: January 11, 2026**
+Tested on versions 1.2024.080 (Build 24781), 1.2025.350 (Build 20387701780)
 
 ## Overview
 
