@@ -2,6 +2,11 @@
 """
 ChatGPT iPhone Backup Conversation Extractor
 Digital Forensics Report Generator
+
+VERSION: Tested on versions 1.2024.080 (Build 24781), 1.2025.350 (Build 20387701780)
+Automatically detects and supports both storage formats:
+- Array format: [id1, node1, id2, node2, ...] (older app versions)
+- Dictionary format: {"id1": node1, "id2": node2, ...} (newer app versions)
 """
 
 import json
@@ -39,64 +44,88 @@ class ConversationExtractor:
         # Try to get device info from Segment analytics files (most comprehensive)
         try:
             import json
-            segment_dir = self.conversations_dir.parent / 'segment' / 'oai'
-            if segment_dir.exists():
-                # Read the most recent segment file
-                segment_files = sorted(segment_dir.glob('*-segment-events.temp'))
+            # Try multiple possible locations for segment files
+            segment_dir = None
+            possible_paths = [
+                self.conversations_dir.parent / 'segment' / 'oai',  # Old location
+                self.conversations_dir.parent.parent.parent / 'Documents' / 'segment' / 'oai',  # New location
+            ]
+            for path in possible_paths:
+                if path.exists():
+                    segment_dir = path
+                    break
+            
+            if segment_dir:
+                # Read the most recent segment file (with or without .temp extension)
+                segment_files = sorted(segment_dir.glob('*-segment-events*'))
                 if segment_files:
                     with open(segment_files[-1], 'r', encoding='utf-8') as f:
                         content = f.read()
-                        # Parse the JSON batch
+                        # Parse the JSON batch (handle both wrapped and direct batch format)
+                        data = None
                         if content.strip().startswith('{ "batch":'):
                             data = json.loads(content)
-                            if 'batch' in data and len(data['batch']) > 0:
-                                # Get the first event with context
-                                for event in data['batch']:
-                                    if 'context' in event:
-                                        ctx = event['context']
-                                        
-                                        # Device info
-                                        if 'device' in ctx:
-                                            dev = ctx['device']
-                                            device_info['device_model'] = dev.get('model', 'Unknown')
-                                            device_info['device_name'] = dev.get('name', 'Unknown')
-                                            device_info['manufacturer'] = dev.get('manufacturer', 'Unknown')
-                                        
-                                        # OS info
-                                        if 'os' in ctx:
-                                            os_data = ctx['os']
-                                            device_info['platform'] = os_data.get('name', 'Unknown')
-                                            device_info['os_version'] = os_data.get('version', 'Unknown')
-                                        
-                                        # Screen info
-                                        if 'screen' in ctx:
-                                            screen = ctx['screen']
-                                            device_info['screen_width'] = str(screen.get('width', 'Unknown'))
-                                            device_info['screen_height'] = str(screen.get('height', 'Unknown'))
-                                        
-                                        # App info
-                                        if 'app' in ctx:
-                                            app = ctx['app']
-                                            device_info['app_version'] = app.get('version', 'Unknown')
-                                            device_info['app_build'] = app.get('build', 'Unknown')
-                                            device_info['app_bundle'] = app.get('namespace', 'Unknown')
-                                        
-                                        # Other info
-                                        device_info['device_id'] = ctx.get('device_id', 'Unknown')
-                                        device_info['timezone'] = ctx.get('timezone', 'Unknown')
-                                        device_info['locale'] = ctx.get('locale', 'Unknown')
-                                        
-                                        # User ID
-                                        if 'userId' in event:
-                                            device_info['user_id'] = event['userId']
-                                        
-                                        # Get OS build from traits if available
-                                        if 'traits' in event:
-                                            traits = event['traits']
-                                            if 'apple_os_version' in traits:
-                                                device_info['os_build'] = traits.get('apple_os_version', 'Unknown')
-                                        
-                                        break
+                        elif content.strip().startswith('{"batch":'):
+                            data = json.loads(content)
+                        
+                        if data and 'batch' in data and len(data['batch']) > 0:
+                            # Get the first event with context
+                            for event in data['batch']:
+                                if 'context' in event:
+                                    ctx = event['context']
+                                    
+                                    # Device info
+                                    if 'device' in ctx:
+                                        dev = ctx['device']
+                                        device_info['device_model'] = dev.get('model', 'Unknown')
+                                        device_info['device_name'] = dev.get('name', 'Unknown')
+                                        device_info['manufacturer'] = dev.get('manufacturer', 'Unknown')
+                                    
+                                    # OS info
+                                    if 'os' in ctx:
+                                        os_data = ctx['os']
+                                        device_info['platform'] = os_data.get('name', 'Unknown')
+                                        device_info['os_version'] = os_data.get('version', 'Unknown')
+                                    
+                                    # Screen info
+                                    if 'screen' in ctx:
+                                        screen = ctx['screen']
+                                        device_info['screen_width'] = str(screen.get('width', 'Unknown'))
+                                        device_info['screen_height'] = str(screen.get('height', 'Unknown'))
+                                    
+                                    # App info
+                                    if 'app' in ctx:
+                                        app = ctx['app']
+                                        device_info['app_version'] = app.get('version', 'Unknown')
+                                        device_info['app_build'] = app.get('build', 'Unknown')
+                                        device_info['app_bundle'] = app.get('namespace', 'Unknown')
+                                    
+                                    # Other info
+                                    device_info['timezone'] = ctx.get('timezone', 'Unknown')
+                                    device_info['locale'] = ctx.get('locale', 'Unknown')
+                                    
+                                    # Device ID - try both old and new locations
+                                    if 'device_id' in ctx:
+                                        # Old format: device_id at root of context
+                                        device_info['device_id'] = ctx['device_id']
+                                    elif 'device' in ctx and 'id' in ctx['device']:
+                                        # New format: device_id inside device object
+                                        device_info['device_id'] = ctx['device']['id']
+                                    
+                                    # User ID
+                                    if 'userId' in event:
+                                        device_info['user_id'] = event['userId']
+                                    
+                                    # Get additional info from traits if available
+                                    if 'traits' in event:
+                                        traits = event['traits']
+                                        if 'apple_os_version' in traits:
+                                            device_info['os_build'] = traits.get('apple_os_version', 'Unknown')
+                                        # Also try device_id from traits as fallback
+                                        if 'device_id' in traits and device_info['device_id'] == 'Unknown':
+                                            device_info['device_id'] = traits['device_id']
+                                    
+                                    break
         except Exception as e:
             print(f"Note: Could not extract from segment files: {e}")
         
@@ -196,14 +225,24 @@ class ConversationExtractor:
             storage_dict = {}
             if 'tree' in data and 'storage' in data['tree']:
                 storage = data['tree']['storage']
-                for i in range(0, len(storage), 2):
-                    if i + 1 < len(storage):
-                        node_id = storage[i]
-                        node_data = storage[i + 1]
-                        storage_dict[node_id] = node_data
+                # Auto-detect storage format: dictionary vs array
+                if isinstance(storage, dict):
+                    # Dictionary format (newer app versions)
+                    storage_dict = storage
+                elif isinstance(storage, list):
+                    # Array format (older app versions)
+                    for i in range(0, len(storage), 2):
+                        if i + 1 < len(storage):
+                            node_id = storage[i]
+                            node_data = storage[i + 1]
+                            storage_dict[node_id] = node_data
             
-            # Find root node
-            root_id = data.get('tree', {}).get('current_node_id')
+            # Find root node - try multiple possible locations
+            root_id = data.get('tree', {}).get('root_node_id')
+            if not root_id:
+                root_id = data.get('tree', {}).get('current_node_id')
+            if not root_id:
+                root_id = data.get('current_leaf_node_id')
             if not root_id:
                 return None
             
@@ -943,8 +982,10 @@ def main():
     # Find conversations directory (supports any GUID)
     conversations_dir = None
     if app_support_dir.exists():
-        # Look for conversations-v3-* folders
+        # Look for conversations-v3-* folders (older versions) or conversations-* (newer versions)
         conv_dirs = list(app_support_dir.glob('conversations-v3-*'))
+        if not conv_dirs:
+            conv_dirs = list(app_support_dir.glob('conversations-*'))
         if conv_dirs:
             # Prefer folders with content, and non-default folders
             conv_dirs_with_content = []
@@ -966,7 +1007,7 @@ def main():
     
     if not conversations_dir or not conversations_dir.exists():
         print(f"Error: No conversations directory found in {app_support_dir}")
-        print(f"Looking for folders matching pattern: conversations-v3-*")
+        print(f"Looking for folders matching pattern: conversations-v3-* or conversations-*")
         sys.exit(1)
     
     print("ChatGPT Conversation Forensic Extractor")
