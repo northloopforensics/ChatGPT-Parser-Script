@@ -3,7 +3,7 @@
 ChatGPT iPhone Backup Conversation Extractor - Forensic Edition
 Digital Forensics Report Generator with Chain of Custody
 
-VERSION: 2.0 
+VERSION: 2.0 Forensic Edition
 Tested on: ChatGPT iOS versions 1.2024.080 (Build 24781), 1.2025.350 (Build 20387701780)
 
 Author: North Loop Consulting
@@ -442,8 +442,6 @@ class ConversationExtractor:
                     <td>{self.case_info.get('evidence_id', 'N/A')}</td>
                     <th>Examiner</th>
                     <td>{self.case_info.get('examiner', 'N/A')}</td>
-                    <th>Examination Date</th>
-                    <td>{self.case_info.get('exam_date', 'N/A')}</td>
                 </tr>
             </table>
             """
