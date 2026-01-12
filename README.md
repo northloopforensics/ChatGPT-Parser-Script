@@ -37,6 +37,14 @@ usage: ChatGPT_IOS_parser.py [-h] [-c CASE_NUMBER] [-e EVIDENCE_ID] [-x EXAMINER
                                       [-q]
                                       backup_path
 ```
+For the CLI date filtering in ChatGPT_IOS_parser_forensic.py, the date format is:
+
+YYYY-MM-DD (ISO 8601 standard)
+
+Examples:
+
+--date-from 2024-01-15
+--date-to 2024-12-31
 
 ### Basic Extraction
 
