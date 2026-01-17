@@ -35,7 +35,7 @@ usage: ChatGPT_IOS_parser.py [-h] [-c CASE_NUMBER] [-e EVIDENCE_ID] [-x EXAMINER
                                       [-f {html,json,csv} [{html,json,csv} ...]] [--no-hash]
                                       [--date-from DATE_FROM] [--date-to DATE_TO] [-l LOG] [-v]
                                       [-q]
-                                      backup_path
+                                      backup_path/com.openai.chat/
 ```
 For the CLI date filtering in ChatGPT_IOS_parser_forensic.py, the date format is:
 
@@ -49,9 +49,7 @@ Examples:
 
 ## Installation
 
-No installation required. Simply place `extract_conversations.py` in the root of your extracted iOS backup folder.
-
-The script uses the default Python library so there is no requirements.txt to content with. 
+The script uses the default Python library so there is no requirements.txt to contend with. 
 
 ## Directory Structure
 
